@@ -128,12 +128,14 @@ public class SignUpActivity extends AppCompatActivity {
                                         }
                                     });
                         }else {
+                            Log.d("Unsuccessful", "createUserEmailAccount: Task Unsuccessful");
 
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            Log.d("Unsuccessful", "onFailure: "+e.getMessage());
 
                         }
                     });
