@@ -28,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+import util.JournalApi;
+
 public class SignUpActivity extends AppCompatActivity {
     private EditText userName, emailSignUp, passwordSignup;
     private Button signUpBtn;
@@ -99,6 +101,10 @@ public class SignUpActivity extends AppCompatActivity {
                                                                     signUpProgress.setVisibility(View.INVISIBLE);
                                                                     String name = task.getResult()
                                                                             .getString("username");
+                                                                    //initialize global variable
+                                                                    JournalApi journalApi = JournalApi.getInstance();
+                                                                    journalApi.setUserId(currentUserId);
+                                                                    journalApi.setUserName(name);
 
                                                                     Intent intent = new Intent(SignUpActivity.this,
                                                                             PostJournalActivity.class);
