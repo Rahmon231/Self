@@ -6,7 +6,7 @@
         android:title="Add Thoughts"
         app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_sign_out"
-        android:title="Title"
+        android:title="Sign out"
         app:showAsAction="never"/>
 
 

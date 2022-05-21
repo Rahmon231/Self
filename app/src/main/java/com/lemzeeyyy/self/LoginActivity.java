@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void loginEmailAndPassword(String email, String password) {
+        loginProgress.setVisibility(View.VISIBLE);
         if(!TextUtils.isEmpty(email)
         && !TextUtils.isEmpty(password)){
             firebaseAuth.signInWithEmailAndPassword(email,password)
@@ -89,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                                 return;
                                             }
                                             if(!value.isEmpty()){
+                                                loginProgress.setVisibility(View.INVISIBLE);
                                                 for (QueryDocumentSnapshot queryDoc :
                                                         value) {
                                                     JournalApi journalApi = JournalApi.getInstance();
@@ -106,6 +108,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            loginProgress.setVisibility(View.INVISIBLE);
 
                         }
                     });
@@ -113,6 +116,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         }else {
             Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            loginProgress.setVisibility(View.INVISIBLE);
         }
 
     }
