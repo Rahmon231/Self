@@ -115,38 +115,30 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
                      .child("my_image_"+ Timestamp.now().getSeconds());
             imagePath.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> {
-                        imagePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                             /*
-                    Create a journal object
-                    invoke collectionReference
-                    add an instance of journal
-                     */
-                                String imageUrl = uri.toString();
-                                Journal journal = new Journal();
-                                journal.setTitle(title);
-                                journal.setDescription(description);
-                                journal.setImageUri(imageUrl);
-                                journal.setTimeAdded(new Timestamp(new Date()));
-                                journal.setUserName(currentUserName);
-                                journal.setUserId(currentUserId);
-                                reference.add(journal)
-                                        .addOnSuccessListener((DocumentReference documentReference) -> {
-                                            postProgress.setVisibility(View.INVISIBLE);
-                                            Intent intent = new Intent(PostJournalActivity.this,
-                                                    JournalListActivity.class);
-                                            startActivity(intent);
-                                            finish();
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.d("jornalnotadded", "onFailure: " + e.getMessage());
-
-                                            }
-                                        });
-                            }
+                        imagePath.getDownloadUrl().addOnSuccessListener(uri -> {
+                         /*
+                Create a journal object
+                invoke collectionReference
+                add an instance of journal
+                 */
+                            String imageUrl = uri.toString();
+                            Journal journal = new Journal();
+                            journal.setTitle(title);
+                            journal.setDescription(description);
+                            journal.setImageUri(imageUrl);
+                            journal.setTimeAdded(new Timestamp(new Date()));
+                            journal.setUserName(currentUserName);
+                            journal.setUserId(currentUserId);
+                            reference.add(journal)
+                                    .addOnSuccessListener((DocumentReference documentReference) -> {
+                                        postProgress.setVisibility(View.INVISIBLE);
+                                        Intent intent = new Intent(PostJournalActivity.this,
+                                                JournalListActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Log.d("jornalnotadded", "onFailure: " + e.getMessage()));
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
@@ -154,12 +146,9 @@ public class PostJournalActivity extends AppCompatActivity implements View.OnCli
                             }
                         });
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            postProgress.setVisibility(View.INVISIBLE);
-                            Log.d("failuremessage", "onFailure: "+e.getMessage());
-                        }
+                    .addOnFailureListener(e -> {
+                        postProgress.setVisibility(View.INVISIBLE);
+                        Log.d("failuremessage", "onFailure: "+e.getMessage());
                     });
 
         }else{
