@@ -2,16 +2,31 @@ package com.lemzeeyyy.self;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.lemzeeyyy.self.model.Journal;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import util.JournalApi;
 
 public class JournalListActivity extends AppCompatActivity {
     private FirebaseUser user;
@@ -19,6 +34,11 @@ public class JournalListActivity extends AppCompatActivity {
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private FirebaseStorage firebaseStorage;
     private FirebaseAuth.AuthStateListener authStateListener;
+    private List<Journal> journalList;
+    private RecyclerView recyclerView;
+    private JornalListRecyclerAdapter jornalListRecyclerAdapter;
+    private CollectionReference collectionReference = firestore.collection("Journals");
+    private TextView noJournal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +46,12 @@ public class JournalListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_journal_list);
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
+        journalList = new ArrayList<>();
+        noJournal = findViewById(R.id.list_no_thought);
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     @Override
@@ -57,5 +83,39 @@ public class JournalListActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        collectionReference.whereEqualTo("userId", JournalApi.getInstance().getUserId())
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if(!queryDocumentSnapshots.isEmpty()){
+                    for (QueryDocumentSnapshot journals :
+                            queryDocumentSnapshots) {
+                        Journal journal = journals.toObject(Journal.class);
+                        journalList.add(journal);
+                    }
+                    //invoke recycler view
+                    jornalListRecyclerAdapter = new JornalListRecyclerAdapter(JournalListActivity.this,
+                            journalList);
+                    recyclerView.setAdapter(jornalListRecyclerAdapter);
+                    jornalListRecyclerAdapter.notifyDataSetChanged();
+
+
+                }else {
+                    noJournal.setVisibility(View.VISIBLE);
+
+                }
+                }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
     }
 }
